@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo RPV / Precatórios</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #F5F5DC;
+        }
+
+        header {
+            position: relative;
+            flex-shrink: 0;
+            text-align: center;
+            padding: 0.8em 0;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-title {
+            font-size: clamp(2em, 5vw, 2.8em);
+            color: #000080;
+            font-weight: bold;
+            margin: 0;
+            text-shadow:
+                0.05em 0.05em 0px rgba(0, 0, 0, 0.2),
+                0.1em 0.1em 0.15em rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.03em;
+            padding: 0 10px;
+        }
+        
+        #header-left {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #digitalClock {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(1.5em, 4vw, 2.2em);
+            font-weight: bold;
+            color: #000080;
+            text-shadow: 1px 1px 0px #ccc, 2px 2px 3px rgba(0,0,0,0.4);
+        }
+
+        #header-right {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #currentDate {
+            font-size: clamp(0.8em, 2vw, 1em);
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            width: 98%;
+            margin: 2px auto;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .left-column-wrapper, .form-section, .results-section {
+            flex: 1 1 280px;
+            min-width: 260px;
+            padding: 10px; 
+            box-sizing: border-box;
+        }
+        
+        .left-column-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .info-box {
+            background-color: #ADD8E6;
+            border: 1px solid #90B0C0;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 
+                4px 4px 0px rgba(0, 0, 0, 0.2),
+                8px 8px 10px rgba(0, 0, 0, 0.15),
+                -2px -2px 5px rgba(255, 255, 255, 0.5) inset;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .info-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                6px 6px 0px rgba(0, 0, 0, 0.25),
+                10px 10px 15px rgba(0, 0, 0, 0.2),
+                -2px -2px 5px rgba(255, 255, 255, 0.6) inset;
+        }
+
+        .form-section {
+            max-width: 420px;
+            padding-top: 10px;
+        }
+        .results-section {
+            border-left: 1px solid #eee;
+            min-height: 150px;
+            padding-top: 10px;
+        }
+
+        .section-main-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #000080;
+            text-align: center;
+            margin-top: 1.5em;
+            margin-bottom: 1em;
+            width: 100%;
+        }
+        .form-section .section-main-title:first-of-type {
+            margin-top: 0.5em;
+        }
+        
+        .results-section h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: red;
+            margin-top: 1.5em; 
+            margin-bottom: 0.8em;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .results-field-group {
+            margin-bottom: 0.8em;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .results-field-group label {
+            margin-bottom: 0.2em;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: black;
+            width: 100%;
+        }
+        .results-field-group input {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            background-color: #fff;
+            color: #000080;
+            font-weight: bold;
+        }
+
+        .info-title {
+            font-size: clamp(1.1em, 3vw, 1.4em);
+            font-weight: bold;
+            color: #00008B;
+            margin-top: 0;
+            margin-bottom: 0.8em;
+            line-height: 1.2;
+            text-align: left;
+        }
+        .info-text {
+            color: #00008B;
+            text-align: justify;
+            line-height: 1.4;
+            margin-bottom: 0.6em;
+            font-size: clamp(0.85em, 2.5vw, 0.95em);
+            font-weight: bold;
+        }
+        .info-text strong {
+            color: #00008B;
+        }
+        
+        .form-group {
+            margin-bottom: 0.8em;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .form-group label {
+            margin-bottom: 0.2em;
+            font-weight: bold;
+            width: 100%;
+            color: black;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95em;
+            background-color: #fff;
+            color: #000080;
+            font-weight: bold;
+        }
+
+        .author-count-group {
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .author-count-group label {
+            color: #006400;
+            font-weight: bold;
+        }
+        .author-count-group select {
+            color: #006400;
+            font-weight: bold;
+            max-width: 80px;
+            margin: 0 auto;
+        }
+
+        .rra-fields {
+            display: block;
+            margin-top: 0.8em;
+            padding-top: 0.8em;
+            border-top: 1px dashed #ddd;
+        }
+
+        .rra-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .rra-row .form-group {
+            flex: 1;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5em;
+        }
+
+        .action-button {
+            background-color: #ADD8E6;
+            color: #000080;
+            border: 1px solid #90B0C0;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            box-shadow: 
+                inset 0px 1px 1px rgba(255,255,255,0.7),
+                3px 3px 5px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
+            transition: all 0.1s ease-in-out;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .action-button:disabled {
+            background-color: #a9a9a9;
+            color: #e0e0e0;
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: none;
+            text-shadow: none;
+        }
+
+        .action-button:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 
+                inset 0px 1px 2px rgba(0,0,0,0.3),
+                1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+        .modal-content-large {
+            max-width: fit-content;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content h2, .modal-content h3 {
+            margin-top: 0;
+            color: #000080;
+            font-size: 1.4em;
+        }
+        .modal-content h3 {
+            font-size: 1.2em;
+            margin-top: 1em;
+        }
+        .modal-content p {
+            font-size: 1.2em;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .modal-desagio-results {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+        }
+        .modal-desagio-results .results-field-group {
+            flex: 1;
+        }
+        .modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s, background-color 0.2s;
+            flex-grow: 1;
+        }
+        .modal-button:hover:not(:disabled) {
+            opacity: 0.8;
+        }
+        .modal-button.sim {
+            background-color: #28a745;
+            color: white;
+        }
+        .modal-button.nao {
+            background-color: #dc3545;
+            color: white;
+        }
+        .modal-button.copiar {
+            background-color: #000080;
+            color: white;
+        }
+        .modal-button:disabled {
+            background-color: #a9a9a9;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .close-modal-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close-modal-button:hover {
+            color: #333;
+        }
+        .modal-content hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+        
+        #detalhamentoModal h2 {
+            cursor: move;
+            user-select: none;
+        }
+        #detalhamentoModal table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        #detalhamentoModal th, #detalhamentoModal td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #detalhamentoModal td {
+            cursor: pointer;
+        }
+        #detalhamentoModal th {
+            background-color: #f2f2f2;
+            color: #000080;
+            font-weight: bold;
+        }
+        #detalhamentoModal td {
+            color: #333;
+        }
+
+        .calculator {
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .calculator-display-container {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .calculator-history {
+            width: 100%;
+            text-align: right;
+            font-size: 0.8em;
+            color: #888;
+            height: 20px;
+            border: none;
+            background: none;
+        }
+        .calculator-display {
+            width: 100%;
+            text-align: right;
+            font-size: 2em;
+            border: none;
+            background: none;
+            color: #333;
+            cursor: pointer;
+        }
+        .calculator-keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .calculator-keys button {
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .calculator-keys button:hover {
+            background-color: #e9e9e9;
+        }
+        .calculator-keys .operator {
+            background-color: #f9a825;
+            color: white;
+        }
+        .calculator-keys .operator:hover {
+            background-color: #fbc02d;
+        }
+        .calculator-keys .equal-sign {
+            background-color: #43a047;
+            color: white;
+        }
+         .calculator-keys .equal-sign:hover {
+            background-color: #66bb6a;
+        }
+        .calculator-keys .clear {
+            background-color: #e53935;
+            color: white;
+        }
+        .calculator-keys .clear:hover {
+            background-color: #ef5350;
+        }
+
+
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, bottom 0.5s, visibility 0.5s;
+        }
+
+        .toast-message.show {
+            opacity: 1;
+            visibility: visible;
+            bottom: 50px;
+        }
+        
+        #iaModal #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border-left-color: #09f;
+          animation: spin 1s ease infinite;
+          margin: 15px auto;
+          display: none;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+
+        @media (max-width: 1024px) {
+            #header-left, #header-right {
+                display: none;
+            }
+            .main-content-wrapper {
+                flex-direction: column;
+                width: 90%;
+                padding: 10px;
+                margin-top: 5px;
+                margin-bottom: 10px;
+                gap: 10px;
+            }
+            .left-column-wrapper, .form-section, .results-section {
+                max-width: 100%;
+                padding: 10px 0;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+            .left-column-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            .results-section {
+                border-bottom: none;
+            }
+            .form-section {
+                padding-top: 10px;
+            }
+            .form-group, .results-field-group {
+                align-items: stretch;
+            }
+            .section-main-title {
+                margin-top: 1em;
+            }
+            .info-box {
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+                transform: none;
+            }
+            .info-box:hover {
+                transform: none;
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            }
+            .modal-content-large {
+                width: 95%;
+                max-width: 95%;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 0.5em 10px;
+            }
+            .header-title {
+                font-size: clamp(1.4em, 6vw, 2em);
+            }
+            .main-content-wrapper {
+                width: 95%;
+                padding: 5px;
+                gap: 8px;
+                margin-top: 2px;
+                margin-bottom: 5px;
+            }
+            .rra-row, .button-container {
+                flex-direction: column;
+                gap: 0.6em;
+                align-items: stretch;
+            }
+            .left-column-wrapper, .form-section, .results-section {
+                padding: 5px 0;
+                min-width: unset;
+            }
+            .info-title {
+                font-size: clamp(1em, 4.5vw, 1.2em);
+            }
+            .info-text {
+                font-size: clamp(0.75em, 3.5vw, 0.85em);
+            }
+            .form-group {
+                margin-bottom: 0.6em;
+            }
+            .form-group label {
+                margin-bottom: 0.1em;
+            }
+            .form-group input,
+            .form-group select,
+            .results-field-group input {
+                padding: 0.3em;
+                font-size: 0.9em;
+            }
+            .section-main-title {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="header-left">
+            <p id="digitalClock"></p>
+        </div>
+        <h1 class="header-title">Cálculo RPV / Precatórios</h1>
+        <div id="header-right">
+            <p id="currentDate"></p>
+        </div>
+    </header>
+
+    <div class="main-content-wrapper">
+        <div class="left-column-wrapper">
+             <div class="button-container">
+                 <button id="rpaTetoButton" class="action-button">CÁLCULO RPV ACIMA DO TETO</button>
+                 <button id="naoTenhoJurosButton" class="action-button">NÃO TENHO O VALOR DOS JUROS (R$)</button>
+                 <button id="desagioButton" class="action-button">CÁLCULO DESÁGIO (R$):</button>
+            </div>
+            <div class="left-column-content">
+                <div class="info-box"> 
+                    <h2 class="info-title">Informações importantes:</h2>
+                    <p class="info-text">
+                        1. Atualmente, o valor limite para expedição de RPV é de <strong>R$ 91.080,00 (noventa e um mil e oitenta reais)</strong> que equivale a 60 (sessenta) salários-mínimos;
+                    </p>
+                    <p class="info-text">
+                        2. O precatório é emitido nos casos de condenações envolvendo valores acima de 60 (sessenta) salários mínimos;
+                    </p>
+                    <p class="info-text">
+                        3. O pagamento de RPVs deve ocorrer em até 60 dias após a expedição da requisição, segundo a Justiça Federal;
+                    </p>
+                    <p class="info-text">
+                        4. O pagamento de precatórios é feito por ordem cronológica de apresentação e pode levar mais tempo, pois envolve a programação orçamentária anual.
+                    </p>
+                    <p class="info-text">
+                        5. Valor atual do Salário mínimo é de <strong>R$ 1.518,00 (um mil quinhentos e dezoito reais) - Ano 2025</strong>.
+                    </p>
+                </div>
+                <div class="calculator">
+                    <div class="calculator-display-container">
+                        <input type="text" class="calculator-history" id="calculatorHistory" readonly>
+                        <input type="text" class="calculator-display" id="calculatorDisplay" value="0" readonly>
+                    </div>
+                    <div class="calculator-keys">
+                        <button class="clear" value="clear">C</button>
+                        <button value="backspace">&larr;</button>
+                        <button class="operator" value="%">%</button>
+                        <button class="operator" value="/">&divide;</button>
+                        
+                        <button value="7">7</button>
+                        <button value="8">8</button>
+                        <button value="9">9</button>
+                        <button class="operator" value="*">&times;</button>
+                        
+                        <button value="4">4</button>
+                        <button value="5">5</button>
+                        <button value="6">6</button>
+                        <button class="operator" value="-">-</button>
+                        
+                        <button value="1">1</button>
+                        <button value="2">2</button>
+                        <button value="3">3</button>
+                        <button class="operator" value="+">+</button>
+
+                        <button value="0" style="grid-column: span 2;">0</button>
+                        <button value=",">,</button>
+                        <button class="equal-sign" value="=">=</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="button-container">
+                 <button id="clearButton" class="action-button">LIMPAR DADOS</button>
+            </div>
+            <h3 class="section-main-title">DADOS INICIAIS</h3>
+            <form>
+                <div class="form-group">
+                    <label for="valorPrincipal">Valor Principal:</label>
+                    <input type="text" id="valorPrincipal" name="valorPrincipal" placeholder="R$ 0,00" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                    <label for="valorJuros">Valor dos Juros:</label>
+                    <input type="text" id="valorJuros" name="valorJuros" placeholder="R$ 0,00" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                    <label for="percentualAdvogado">Percentual do Advogado:</label>
+                    <input type="text" id="percentualAdvogado" name="percentualAdvogado" placeholder="0%" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                    <label for="total">Total:</label>
+                    <input type="text" id="total" name="total" placeholder="R$ 0,00" readonly>
+                </div>
+
+                <div class="button-container">
+                    <button id="iaRraButton" type="button" class="action-button">CÁLCULO DO RRA</button>
+                </div>
+                <div id="rraFields" class="rra-fields">
+                    <div class="rra-row">
+                        <div class="form-group">
+                            <label for="parcelasExercicioAnterior">Nº de parcelas de exercícios anteriores:</label>
+                            <input type="text" id="parcelasExercicioAnterior" name="parcelasExercicioAnterior" placeholder="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorTotalAnterior">Valor Total:</label>
+                            <input type="text" id="valorTotalAnterior" name="valorTotalAnterior" placeholder="R$ 0,00" readonly>
+                        </div>
+                    </div>
+                    <div class="rra-row">
+                        <div class="form-group">
+                            <label for="parcelasExercicioAtual">Nº de parcelas no exercício atual:</label>
+                            <input type="text" id="parcelasExercicioAtual" name="parcelasExercicioAtual" placeholder="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorTotalAtual">Valor Total:</label>
+                            <input type="text" id="valorTotalAtual" name="valorTotalAtual" placeholder="R$ 0,00" readonly>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h3>VALORES PARA O AUTOR</h3>
+            <div class="form-group author-count-group">
+                <label for="numAutores">nº de autores:</label>
+                <select id="numAutores">
+                    <option value="1"></option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+            <div class="results-field-group">
+                <label for="valorPrincipalAutor">Valor principal (autor):</label>
+                <input type="text" id="valorPrincipalAutor" name="valorPrincipalAutor" placeholder="R$ 0,00" readonly>
+            </div>
+            <div class="results-field-group">
+                <label for="jurosAutor">Juros (autor):</label>
+                <input type="text" id="jurosAutor" name="jurosAutor" placeholder="R$ 0,00" readonly>
+            </div>
+            <div class="results-field-group">
+                <label for="totalAutor">Total (autor):</label>
+                <input type="text" id="totalAutor" name="totalAutor" placeholder="R$ 0,00" readonly>
+            </div>
+
+            <h3>VALORES PARA O ADVOGADO</h3>
+            <div class="results-field-group">
+                <label for="valorPrincipalAdvogado">Valor principal (adv):</label>
+                <input type="text" id="valorPrincipalAdvogado" name="valorPrincipalAdvogado" placeholder="R$ 0,00" readonly>
+            </div>
+            <div class="results-field-group">
+                <label for="jurosAdvogado">Juros (adv):</label>
+                <input type="text" id="jurosAdvogado" name="jurosAdvogado" placeholder="R$ 0,00" readonly>
+            </div>
+            <div class="results-field-group">
+                <label for="totalAdvogado">Total (adv):</label>
+                <input type="text" id="totalAdvogado" name="totalAdvogado" placeholder="R$ 0,00" readonly>
+            </div>
+        </div>
+    </div>
+    
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <p>Deseja realmente limpar os dados?</p>
+            <div class="modal-buttons">
+                <button id="confirmClearButton" class="modal-button sim">SIM</button>
+                <button id="cancelClearButton" class="modal-button nao">NÃO</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rpaTetoModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal-button">&times;</span>
+            <h2>Cálculo de RPV acima do teto do JEF:</h2>
+            <div class="form-group">
+                <label for="rpaValorTotal">Insira o valor total com os juros:</label>
+                <input type="text" id="rpaValorTotal" placeholder="R$ 0,00">
+            </div>
+            <div class="form-group">
+                <label for="rpaValorJuros">Insira somente o valor dos juros:</label>
+                <input type="text" id="rpaValorJuros" placeholder="R$ 0,00">
+            </div>
+            <div class="modal-buttons">
+                <button id="calculateRpaButton" class="action-button">CALCULAR</button>
+                <button id="clearRpaModalButton" class="modal-button nao">Limpar Dados</button>
+            </div>
+            <hr>
+            <div class="results-field-group">
+                <label for="rpaPercentualJuros">Percentual de juros sob o valor acima do teto:</label>
+                <input type="text" id="rpaPercentualJuros" readonly placeholder="0,00%">
+            </div>
+            <div class="results-field-group">
+                <label for="rpaJurosTeto">Juros sob R$ 91.080,00:</label>
+                <input type="text" id="rpaJurosTeto" readonly placeholder="R$ 0,00">
+            </div>
+            <div class="results-field-group">
+                <label for="rpaValorOriginalTeto">Valor original (Teto: R$ 91.080,00):</label>
+                <input type="text" id="rpaValorOriginalTeto" readonly placeholder="R$ 0,00">
+            </div>
+            <div class="button-container">
+                 <button id="copyRpaButton" class="modal-button copiar" disabled>Copiar Dados</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="jurosModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal-button">&times;</span>
+            <h2>Calcular Valor dos Juros</h2>
+            <div class="form-group">
+                <label for="jurosModalValorPrincipal">Informe o valor principal:</label>
+                <input type="text" id="jurosModalValorPrincipal" placeholder="R$ 0,00">
+            </div>
+            <div class="form-group">
+                <label for="jurosModalValorCorrigido">Informe o valor corrigido:</label>
+                <input type="text" id="jurosModalValorCorrigido" placeholder="R$ 0,00">
+            </div>
+            <div class="results-field-group">
+                <label for="jurosModalResultado">Resultado:</label>
+                <input type="text" id="jurosModalResultado" readonly placeholder="R$ 0,00">
+            </div>
+            <div class="modal-buttons">
+                 <button id="copyJurosModalButton" class="modal-button copiar" disabled>Copiar Dados</button>
+                 <button id="clearJurosModalButton" class="modal-button nao">Limpar Dados</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="desagioModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Cálculo de Deságio</h2>
+            <div class="form-group">
+                <label for="desagioValorPrincipal">Insira o Valor Principal (R$):</label>
+                <input type="text" id="desagioValorPrincipal" placeholder="R$ 0,00">
+            </div>
+            <div class="form-group">
+                <label for="desagioValorJuros">Insira o Valor total dos Juros (R$):</label>
+                <input type="text" id="desagioValorJuros" placeholder="R$ 0,00">
+            </div>
+            <div class="form-group">
+                <label for="desagioPercentual">Percentual de Deságio(%):</label>
+                <input type="text" id="desagioPercentual" placeholder="0%">
+            </div>
+            <div class="modal-buttons">
+                <button id="calculateDesagioButton" class="action-button">Calcular</button>
+                <button id="clearDesagioButton" class="modal-button nao">Limpar dados</button>
+            </div>
+            <hr>
+            <div class="results-field-group">
+                <label for="desagioResultadoPrincipal">Valor Principal após deságio (R$):</label>
+                <input type="text" id="desagioResultadoPrincipal" readonly placeholder="R$ 0,00">
+            </div>
+            <div class="results-field-group">
+                <label for="desagioResultadoJuros">Valor dos Juros após deságio (R$):</label>
+                <input type="text" id="desagioResultadoJuros" readonly placeholder="R$ 0,00">
+            </div>
+            <div class="results-field-group">
+                <label for="desagioResultadoTotal">Total após Deságio(R$):</label>
+                <input type="text" id="desagioResultadoTotal" readonly placeholder="R$ 0,00">
+            </div>
+            <hr>
+            <h3>DESÁGIO</h3>
+            <div class="modal-desagio-results">
+                <div class="results-field-group">
+                    <label for="desagioValorPrincipalCalculado">Deságio do Principal (R$):</label>
+                    <input type="text" id="desagioValorPrincipalCalculado" readonly placeholder="R$ 0,00">
+                </div>
+                <div class="results-field-group">
+                    <label for="desagioValorJurosCalculado">Deságio dos Juros (R$):</label>
+                    <input type="text" id="desagioValorJurosCalculado" readonly placeholder="R$ 0,00">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                 <button id="copyDesagioButton" class="modal-button copiar" disabled>Copiar Dados</button>
+                 <button id="closeDesagioButton" class="modal-button nao">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="detalhamentoModal" class="modal-overlay">
+        <div class="modal-content modal-content-large">
+             <span class="close-modal-button">&times;</span>
+             <h2>DETALHAMENTO</h2>
+             <div id="detalhamentoContent"></div>
+             <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="closeDetalhamentoDetailBtn" class="modal-button nao">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="iaModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal-button">&times;</span>
+            <h2>Cálculo por Inteligência Artificial</h2>
+            <div class="form-group">
+                <label for="imageUpload">Envie a imagem da planilha:</label>
+                <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/jpg">
+            </div>
+            <img id="imagePreview" src="#" alt="Pré-visualização da imagem" style="display: none;"/>
+            <div class="spinner" id="iaSpinner"></div>
+            <p id="iaError" style="color: red; display: none;"></p>
+            <div class="modal-buttons">
+                <button id="analyzeImageButton" class="action-button" disabled>Analisar Imagem</button>
+                <button id="copyIaDataButton" class="modal-button copiar" disabled>Copiar Dados</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="warningModal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="warningMessage"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        let iaResult = null; // Variável global para armazenar o resultado da IA
+        /**
+         * Converte uma string de moeda (ex: "R$ 1.234,56") para um número.
+         * @param {string} valueString - A string a ser convertida.
+         * @returns {number} O valor numérico.
+         */
+        function parseCurrencyToNumber(valueString) {
+            if (!valueString) return 0;
+            return parseFloat(valueString.replace('R$', '').replace(/\./g, '').replace(',', '.') || '0');
+        }
+
+        /**
+         * Trunca um número para duas casas decimais.
+         * @param {number} numberValue - O número a ser truncado.
+         * @returns {number} O número truncado.
+         */
+        function truncateToTwoDecimals(numberValue) {
+            return Math.floor(numberValue * 100) / 100;
+        }
+
+        /**
+         * Formata um número para uma string de moeda BRL com 2 casas decimais.
+         * @param {number} numberValue - O número a ser formatado.
+         * @returns {string} A string de moeda formatada.
+         */
+        function formatCurrency(numberValue) {
+            return numberValue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        /**
+         * Formata o valor de um campo de input como moeda enquanto o usuário digita.
+         * @param {HTMLInputElement} inputElement - O elemento input.
+         */
+        function formatInputCurrency(inputElement) {
+            let value = inputElement.value.replace(/\D/g, '');
+            if (value === '') {
+                inputElement.value = '';
+                return;
+            }
+            inputElement.value = (parseInt(value) / 100).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                minimumFractionDigits: 2
+            });
+        }
+        
+        /**
+         * Formata o valor de um campo de input numérico.
+         * @param {HTMLInputElement} input - O elemento input.
+         */
+        function formatNumericInput(input) {
+             input.value = input.value.replace(/\D/g, '');
+        }
+
+        /**
+         * Formata o valor de um campo de input como porcentagem.
+         * @param {HTMLInputElement} input - O elemento input.
+         */
+        function formatPercentage(input) {
+            let value = input.value.replace('%', '');
+            value = value.replace(/[^\d,]/g, '');
+            let parts = value.split(',');
+            if (parts.length > 2) {
+                value = parts[0] + ',' + parts.slice(1).join('');
+            }
+            if (value) {
+                input.value = value + '%';
+            } else {
+                input.value = '';
+            }
+        }
+        
+        /**
+         * Formata um número como uma string de porcentagem.
+         * @param {number} numberValue - O número a ser formatado.
+         * @returns {string} A string de porcentagem formatada.
+         */
+        function formatPercentageOutput(numberValue) {
+             if (isNaN(numberValue)) return '0,00%';
+             return numberValue.toFixed(2).replace('.', ',') + '%';
+        }
+        
+        /**
+         * Mostra uma mensagem temporária (toast) na tela.
+         * @param {string} message - A mensagem a ser exibida.
+         */
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-message');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if(document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 500);
+            }, 3000);
+        }
+        
+        /**
+         * Mostra um modal de aviso temporário.
+         * @param {string} message - A mensagem a ser exibida no modal.
+         */
+        function showWarningModal(message) {
+            const warningModal = document.getElementById('warningModal');
+            const warningMessage = document.getElementById('warningMessage');
+            warningMessage.textContent = message;
+            warningModal.classList.add('active');
+            setTimeout(() => {
+                warningModal.classList.remove('active');
+            }, 2000);
+        }
+
+        /**
+         * Roda todos os cálculos e atualiza a interface.
+         */
+        function runCalculations() {
+            const valorPrincipalInput = document.getElementById('valorPrincipal');
+            const valorJurosInput = document.getElementById('valorJuros');
+            const totalInput = document.getElementById('total');
+            const percentualAdvogadoStr = document.getElementById('percentualAdvogado').value;
+            const valorPrincipalAdvogadoInput = document.getElementById('valorPrincipalAdvogado');
+            const jurosAdvogadoInput = document.getElementById('jurosAdvogado');
+            const totalAdvogadoInput = document.getElementById('totalAdvogado');
+            const valorPrincipalAutorInput = document.getElementById('valorPrincipalAutor');
+            const jurosAutorInput = document.getElementById('jurosAutor');
+            const totalAutorInput = document.getElementById('totalAutor');
+            const numAutoresSelect = document.getElementById('numAutores');
+            const detalhamentoModal = document.getElementById('detalhamentoModal');
+
+            const valorPrincipal = parseCurrencyToNumber(valorPrincipalInput.value);
+            const valorJuros = parseCurrencyToNumber(valorJurosInput.value);
+            const percentualAdvogado = parseFloat(percentualAdvogadoStr.replace('%', '').replace(',', '.')) / 100 || 0;
+            const numAutores = parseInt(numAutoresSelect.value) || 1;
+
+            const totalGeral = valorPrincipal + valorJuros;
+            
+            const vpAdvogadoBase = truncateToTwoDecimals(valorPrincipal * percentualAdvogado);
+            const jAdvogadoBase = truncateToTwoDecimals(valorJuros * percentualAdvogado);
+            const totalAdvogadoBase = vpAdvogadoBase + jAdvogadoBase;
+            
+            const vpAutorBase = valorPrincipal - vpAdvogadoBase;
+            const jAutorBase = valorJuros - jAdvogadoBase;
+            const totalAutorBase = vpAutorBase + jAutorBase;
+            
+            valorPrincipalAdvogadoInput.value = formatCurrency(vpAdvogadoBase);
+            jurosAdvogadoInput.value = formatCurrency(jAdvogadoBase);
+            totalAdvogadoInput.value = formatCurrency(totalAdvogadoBase);
+
+            valorPrincipalAutorInput.value = formatCurrency(vpAutorBase);
+            jurosAutorInput.value = formatCurrency(jAutorBase);
+            totalAutorInput.value = formatCurrency(totalAutorBase);
+
+            if (numAutores > 1) {
+                detalhamentoModal.classList.add('active');
+                generateDetalhamentoTable(numAutores, vpAutorBase, jAutorBase, vpAdvogadoBase, jAdvogadoBase);
+            } else {
+                 detalhamentoModal.classList.remove('active');
+            }
+            
+            const parcelasAnteriores = parseInt(document.getElementById('parcelasExercicioAnterior').value) || 0;
+            const parcelasAtuais = parseInt(document.getElementById('parcelasExercicioAtual').value) || 0;
+            const totalParcelas = parcelasAnteriores + parcelasAtuais;
+
+            if(totalParcelas > 0) {
+                // Se os valores de RRA foram preenchidos (manualmente ou via IA),
+                // o valor total é a soma dos dois campos.
+                // A lógica de recálculo (divisão) não é mais necessária aqui,
+                // pois os valores já vêm separados.
+            }
+
+            totalInput.value = formatCurrency(totalGeral);
+        }
+
+        /**
+         * Gera e insere a tabela de detalhamento no modal.
+         */
+        function generateDetalhamentoTable(numAutores, vpAutorTotal, jAutorTotal, vpAdvTotal, jAdvTotal) {
+            const contentDiv = document.getElementById('detalhamentoContent');
+            
+            const [vpAutorDividido, jAutorDividido] = distributeValues(vpAutorTotal, jAutorTotal, numAutores);
+            const [vpAdvDividido, jAdvDividido] = distributeValues(vpAdvTotal, jAdvTotal, numAutores);
+
+            let totalAutorDividido = vpAutorDividido.map((val, index) => val + jAutorDividido[index]);
+            let totalAdvDividido = vpAdvDividido.map((val, index) => val + jAdvDividido[index]);
+            
+            let tableHTML = `<h3 style="color: red;">CÁLCULOS PARA OS AUTORES DA AÇÃO</h3>
+                             <table>
+                                <thead>
+                                    <tr>
+                                        <th>Valores</th>`;
+            for(let i=1; i<=numAutores; i++) { tableHTML += `<th>AUTOR ${i}</th>`; }
+            tableHTML += `<th>TOTAL AUTOR</th></tr></thead><tbody>`;
+
+            tableHTML += `<tr><td>Principal</td>`;
+            vpAutorDividido.forEach(val => tableHTML += `<td>${formatCurrency(val)}</td>`);
+            tableHTML += `<td>${formatCurrency(vpAutorTotal)}</td></tr>`;
+
+            tableHTML += `<tr><td>Juros</td>`;
+            jAutorDividido.forEach(val => tableHTML += `<td>${formatCurrency(val)}</td>`);
+            tableHTML += `<td>${formatCurrency(jAutorTotal)}</td></tr>`;
+
+            tableHTML += `<tr><td>Total</td>`;
+            totalAutorDividido.forEach(val => tableHTML += `<td>${formatCurrency(val)}</td>`);
+            tableHTML += `<td>${formatCurrency(vpAutorTotal + jAutorTotal)}</td></tr>`;
+            
+            tableHTML += `</tbody></table>`;
+            
+            tableHTML += `<h3 style="color: red;">CÁLCULOS PARA O(S) ADVOGADO(S)</h3>
+                             <table>
+                                <thead>
+                                    <tr>
+                                        <th>Valores</th>`;
+            for(let i=1; i<=numAutores; i++) { tableHTML += `<th>ADVOGADO ${i}</th>`; }
+            tableHTML += `<th>TOTAL ADV</th></tr></thead><tbody>`;
+            
+            tableHTML += `<tr><td>Principal</td>`;
+            vpAdvDividido.forEach(val => tableHTML += `<td>${formatCurrency(val)}</td>`);
+            tableHTML += `<td>${formatCurrency(vpAdvTotal)}</td></tr>`;
+
+            tableHTML += `<tr><td>Juros</td>`;
+            jAdvDividido.forEach(val => tableHTML += `<td>${formatCurrency(val)}</td>`);
+            tableHTML += `<td>${formatCurrency(jAdvTotal)}</td></tr>`;
+            
+            tableHTML += `<tr><td>Total</td>`;
+            totalAdvDividido.forEach(val => tableHTML += `<td>${formatCurrency(val)}</td>`);
+            tableHTML += `<td>${formatCurrency(vpAdvTotal + jAdvTotal)}</td></tr>`;
+
+            tableHTML += `</tbody></table>`;
+
+            contentDiv.innerHTML = tableHTML;
+
+            contentDiv.querySelectorAll('td').forEach(td => {
+                td.addEventListener('mousedown', (event) => {
+                    const field = event.target;
+                    const valueToCopy = field.textContent;
+
+                    if (valueToCopy && valueToCopy.includes('R$')) {
+                        let strippedValue = valueToCopy.replace('R$', '').trim();
+                        
+                        const textArea = document.createElement('textarea');
+                        textArea.value = strippedValue;
+                        textArea.style.position = 'fixed'; 
+                        textArea.style.left = '-9999px';
+                        document.body.appendChild(textArea);
+                        
+                        textArea.select();
+                        textArea.setSelectionRange(0, 99999);
+                        
+                        try {
+                            document.execCommand('copy');
+                            showToast('O conteúdo deste campo foi copiado');
+                        } catch (err) {
+                            console.error('Falha ao copiar: ', err);
+                            showToast('Erro ao copiar.');
+                        }
+                        
+                        document.body.removeChild(textArea);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Distribui valores para garantir que a soma seja exata.
+         */
+        function distributeValues(principal, juros, numAutores) {
+            function distribute(total) {
+                if (numAutores === 0) return [];
+                
+                const parcelaBase = truncateToTwoDecimals(total / numAutores);
+                const distribuido = Array(numAutores).fill(parcelaBase);
+                
+                let restoEmCentavos = Math.round((total - (parcelaBase * numAutores)) * 100);
+
+                for (let i = 0; i < restoEmCentavos; i++) {
+                    distribuido[i] = parseFloat((distribuido[i] + 0.01).toFixed(2));
+                }
+                return distribuido;
+            }
+
+            const vpDistribuido = distribute(principal);
+            const jDistribuido = distribute(juros);
+            
+            return [vpDistribuido, jDistribuido];
+        }
+
+        /**
+         * Limpa todos os campos de entrada do usuário.
+         */
+        function clearAllFields() {
+            document.getElementById('valorPrincipal').value = '';
+            document.getElementById('valorJuros').value = '';
+            document.getElementById('percentualAdvogado').value = '';
+            document.getElementById('parcelasExercicioAnterior').value = '';
+            document.getElementById('parcelasExercicioAtual').value = '';
+            document.getElementById('valorTotalAnterior').value = '';
+            document.getElementById('valorTotalAtual').value = '';
+            document.getElementById('numAutores').value = '1';
+            runCalculations();
+        }
+        
+        function makeDraggable(element, handle) {
+            let isDragging = false;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            handle.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                const rect = element.getBoundingClientRect();
+                
+                element.style.position = 'absolute';
+                element.style.transform = 'none'; 
+                
+                element.style.left = `${rect.left}px`;
+                element.style.top = `${rect.top}px`;
+                
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                handle.style.cursor = 'grabbing';
+                document.body.style.userSelect = 'none';
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            function onMouseMove(e) {
+                if (!isDragging) return;
+                
+                let newX = e.clientX - offsetX;
+                let newY = e.clientY - offsetY;
+
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+            }
+
+            function onMouseUp() {
+                isDragging = false;
+                handle.style.cursor = 'move';
+                document.body.style.userSelect = '';
+                
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+        }
+
+        // --- Event Listeners ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            runCalculations(); 
+            
+            const detalhamentoModal = document.getElementById('detalhamentoModal');
+            const detalhamentoModalContent = detalhamentoModal.querySelector('.modal-content');
+            const detalhamentoHeader = detalhamentoModal.querySelector('h2');
+            const closeDetalhamentoModal = detalhamentoModal.querySelector('.close-modal-button');
+            const closeDetalhamentoDetailBtn = document.getElementById('closeDetalhamentoDetailBtn');
+            
+            makeDraggable(detalhamentoModalContent, detalhamentoHeader);
+
+            function closeAndResetDetalhamentoModal() {
+                detalhamentoModal.classList.remove('active');
+                detalhamentoModalContent.style.position = '';
+                detalhamentoModalContent.style.top = '';
+                detalhamentoModalContent.style.left = '';
+                detalhamentoModalContent.style.transform = '';
+            }
+
+            closeDetalhamentoModal.addEventListener('click', closeAndResetDetalhamentoModal);
+            closeDetalhamentoDetailBtn.addEventListener('click', closeAndResetDetalhamentoModal);
+
+            const clearButton = document.getElementById('clearButton');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmClearButton = document.getElementById('confirmClearButton');
+            const cancelClearButton = document.getElementById('cancelClearButton');
+
+            clearButton.addEventListener('click', () => confirmationModal.classList.add('active'));
+            cancelClearButton.addEventListener('click', () => confirmationModal.classList.remove('active'));
+            confirmClearButton.addEventListener('click', () => {
+                clearAllFields();
+                confirmationModal.classList.remove('active');
+            });
+            confirmationModal.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) confirmationModal.classList.remove('active');
+            });
+
+            const rpaTetoButton = document.getElementById('rpaTetoButton');
+            const rpaTetoModal = document.getElementById('rpaTetoModal');
+            const closeRpaModal = rpaTetoModal.querySelector('.close-modal-button');
+            const calculateRpaButton = document.getElementById('calculateRpaButton');
+            const copyRpaButton = document.getElementById('copyRpaButton');
+            const rpaValorTotalInput = document.getElementById('rpaValorTotal');
+            const clearRpaModalButton = document.getElementById('clearRpaModalButton');
+
+            rpaTetoButton.addEventListener('click', () => rpaTetoModal.classList.add('active'));
+            closeRpaModal.addEventListener('click', () => rpaTetoModal.classList.remove('active'));
+            
+            rpaValorTotalInput.addEventListener('blur', () => {
+                const valorTotalComJuros = parseCurrencyToNumber(rpaValorTotalInput.value);
+                const tetoRPV = 91080.00;
+                if (valorTotalComJuros > 0 && valorTotalComJuros <= tetoRPV) {
+                    showWarningModal('Valor inserido não está acima do teto referência para emissão de RPV (R$ 91.080,00). Verifique o valor correto a ser inserido.');
+                    rpaValorTotalInput.value = '';
+                    rpaValorTotalInput.focus();
+                }
+            });
+
+            calculateRpaButton.addEventListener('click', () => {
+                const valorTotalComJuros = parseCurrencyToNumber(rpaValorTotalInput.value);
+                const tetoRPV = 91080.00;
+
+                if (valorTotalComJuros <= tetoRPV) {
+                    showWarningModal('Valor inserido não está acima do teto referência para emissão de RPV (R$ 91.080,00). Verifique o valor correto a ser inserido.');
+                    return;
+                }
+
+                const valorSomenteJuros = parseCurrencyToNumber(document.getElementById('rpaValorJuros').value);
+
+                let percentualJuros = 0;
+                if(valorTotalComJuros > 0) {
+                    percentualJuros = (valorSomenteJuros / valorTotalComJuros) * 100;
+                }
+                
+                const jurosSobreTeto = tetoRPV * (percentualJuros / 100);
+                const valorOriginalTeto = tetoRPV - jurosSobreTeto;
+
+                document.getElementById('rpaPercentualJuros').value = formatPercentageOutput(percentualJuros);
+                document.getElementById('rpaJurosTeto').value = formatCurrency(jurosSobreTeto);
+                document.getElementById('rpaValorOriginalTeto').value = formatCurrency(valorOriginalTeto);
+                
+                copyRpaButton.disabled = false;
+            });
+            
+            function clearRpaModalFields() {
+                rpaValorTotalInput.value = '';
+                document.getElementById('rpaValorJuros').value = '';
+                document.getElementById('rpaPercentualJuros').value = '';
+                document.getElementById('rpaJurosTeto').value = '';
+                document.getElementById('rpaValorOriginalTeto').value = '';
+                copyRpaButton.disabled = true;
+                rpaValorTotalInput.focus();
+            }
+
+            clearRpaModalButton.addEventListener('click', clearRpaModalFields);
+
+            copyRpaButton.addEventListener('click', () => {
+                const jurosValue = document.getElementById('rpaJurosTeto').value;
+                const principalValue = document.getElementById('rpaValorOriginalTeto').value;
+
+                document.getElementById('valorJuros').value = jurosValue;
+                document.getElementById('valorPrincipal').value = principalValue;
+
+                runCalculations();
+                showToast('Dados copiados. Volte para a tela anterior para continuar os cálculos.');
+            });
+
+            const naoTenhoJurosButton = document.getElementById('naoTenhoJurosButton');
+            const jurosModal = document.getElementById('jurosModal');
+            const closeJurosModal = jurosModal.querySelector('.close-modal-button');
+            const copyJurosModalButton = document.getElementById('copyJurosModalButton');
+            const clearJurosModalButton = document.getElementById('clearJurosModalButton');
+            const jurosModalPrincipal = document.getElementById('jurosModalValorPrincipal');
+            const jurosModalCorrigido = document.getElementById('jurosModalValorCorrigido');
+            const jurosModalResultado = document.getElementById('jurosModalResultado');
+
+            naoTenhoJurosButton.addEventListener('click', () => jurosModal.classList.add('active'));
+            closeJurosModal.addEventListener('click', () => jurosModal.classList.remove('active'));
+            jurosModal.addEventListener('click', (e) => {
+                if (e.target === jurosModal) jurosModal.classList.remove('active');
+            });
+            
+            function calculateJurosModal() {
+                const principal = parseCurrencyToNumber(jurosModalPrincipal.value);
+                const corrigido = parseCurrencyToNumber(jurosModalCorrigido.value);
+                const resultado = corrigido - principal;
+                jurosModalResultado.value = formatCurrency(resultado);
+                copyJurosModalButton.disabled = resultado <= 0;
+            }
+
+            function clearJurosModalFields() {
+                jurosModalPrincipal.value = '';
+                jurosModalCorrigido.value = '';
+                calculateJurosModal();
+                jurosModalPrincipal.focus();
+            }
+
+            jurosModalPrincipal.addEventListener('input', function() { formatInputCurrency(this); calculateJurosModal(); });
+            jurosModalCorrigido.addEventListener('input', function() { formatInputCurrency(this); calculateJurosModal(); });
+            clearJurosModalButton.addEventListener('click', clearJurosModalFields);
+
+            copyJurosModalButton.addEventListener('click', () => {
+                document.getElementById('valorPrincipal').value = jurosModalPrincipal.value;
+                document.getElementById('valorJuros').value = jurosModalResultado.value;
+                runCalculations();
+                jurosModal.classList.remove('active');
+                showToast('Dados copiados para a tela principal.');
+            });
+
+            const desagioButton = document.getElementById('desagioButton');
+            const desagioModal = document.getElementById('desagioModal');
+
+            const calculateDesagioButton = document.getElementById('calculateDesagioButton');
+            const clearDesagioButton = document.getElementById('clearDesagioButton');
+            const copyDesagioButton = document.getElementById('copyDesagioButton');
+            const closeDesagioButton = document.getElementById('closeDesagioButton');
+
+            const desagioValorPrincipalInput = document.getElementById('desagioValorPrincipal');
+            const desagioValorJurosInput = document.getElementById('desagioValorJuros');
+            const desagioPercentualInput = document.getElementById('desagioPercentual');
+            const desagioResultadoPrincipalInput = document.getElementById('desagioResultadoPrincipal');
+            const desagioResultadoJurosInput = document.getElementById('desagioResultadoJuros');
+            const desagioResultadoTotalInput = document.getElementById('desagioResultadoTotal');
+            const desagioValorPrincipalCalculadoInput = document.getElementById('desagioValorPrincipalCalculado');
+            const desagioValorJurosCalculadoInput = document.getElementById('desagioValorJurosCalculado');
+
+            desagioButton.addEventListener('click', () => desagioModal.classList.add('active'));
+            closeDesagioButton.addEventListener('click', () => desagioModal.classList.remove('active'));
+
+            function clearDesagioModalFields() {
+                desagioValorPrincipalInput.value = '';
+                desagioValorJurosInput.value = '';
+                desagioPercentualInput.value = '';
+                desagioResultadoPrincipalInput.value = '';
+                desagioResultadoJurosInput.value = '';
+                desagioResultadoTotalInput.value = '';
+                desagioValorPrincipalCalculadoInput.value = '';
+                desagioValorJurosCalculadoInput.value = '';
+                copyDesagioButton.disabled = true;
+                desagioValorPrincipalInput.focus();
+            }
+            clearDesagioButton.addEventListener('click', clearDesagioModalFields);
+
+            calculateDesagioButton.addEventListener('click', () => {
+                const principal = parseCurrencyToNumber(desagioValorPrincipalInput.value);
+                const juros = parseCurrencyToNumber(desagioValorJurosInput.value);
+                const percentualStr = desagioPercentualInput.value;
+                const percentual = parseFloat(percentualStr.replace('%', '').replace(',', '.')) / 100 || 0;
+
+                const principalAposDesagio = truncateToTwoDecimals(principal * (1 - percentual));
+                const jurosAposDesagio = truncateToTwoDecimals(juros * (1 - percentual));
+                const totalAposDesagio = principalAposDesagio + jurosAposDesagio;
+
+                const desagioPrincipal = truncateToTwoDecimals(principal * percentual);
+                const desagioJuros = truncateToTwoDecimals(juros * percentual);
+
+                desagioResultadoPrincipalInput.value = formatCurrency(principalAposDesagio);
+                desagioResultadoJurosInput.value = formatCurrency(jurosAposDesagio);
+                desagioResultadoTotalInput.value = formatCurrency(totalAposDesagio);
+                desagioValorPrincipalCalculadoInput.value = formatCurrency(desagioPrincipal);
+                desagioValorJurosCalculadoInput.value = formatCurrency(desagioJuros);
+
+                copyDesagioButton.disabled = false;
+            });
+
+            copyDesagioButton.addEventListener('click', () => {
+                document.getElementById('valorPrincipal').value = desagioResultadoPrincipalInput.value;
+                document.getElementById('valorJuros').value = desagioResultadoJurosInput.value;
+                runCalculations();
+                showToast('Dados copiados para a tela principal.');
+            });
+
+
+            desagioValorPrincipalInput.addEventListener('input', function() { formatInputCurrency(this); });
+            desagioValorJurosInput.addEventListener('input', function() { formatInputCurrency(this); });
+            desagioPercentualInput.addEventListener('input', function() { formatPercentage(this); });
+
+            document.getElementById('rpaValorTotal').addEventListener('input', function() { formatInputCurrency(this); });
+            document.getElementById('rpaValorJuros').addEventListener('input', function() { formatInputCurrency(this); });
+            
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                if (input.id === 'calculatorDisplay') return; 
+                input.addEventListener('mousedown', (event) => {
+                    const field = event.target;
+                    let valueToCopy = field.value;
+
+                    if (valueToCopy && valueToCopy !== 'R$ 0,00' && valueToCopy !== '0' && valueToCopy !== '0%') {
+                        let strippedValue = valueToCopy;
+                        if (strippedValue.includes('R$')) {
+                            strippedValue = strippedValue.replace('R$', '').trim();
+                        } else if (strippedValue.includes('%')) {
+                            strippedValue = strippedValue.replace('%', '').trim();
+                        }
+                        
+                        const textArea = document.createElement('textarea');
+                        textArea.value = strippedValue;
+                        textArea.style.position = 'fixed'; 
+                        textArea.style.left = '-9999px';
+                        document.body.appendChild(textArea);
+                        
+                        textArea.select();
+                        textArea.setSelectionRange(0, 99999);
+                        
+                        try {
+                            document.execCommand('copy');
+                            showToast('O conteúdo deste campo foi copiado');
+                        } catch (err) {
+                            console.error('Falha ao copiar: ', err);
+                            showToast('Erro ao copiar.');
+                        }
+                        
+                        document.body.removeChild(textArea);
+                    }
+                });
+            });
+
+            document.getElementById('valorPrincipal').addEventListener('input', function() {
+                formatInputCurrency(this);
+                runCalculations();
+            });
+
+            document.getElementById('valorJuros').addEventListener('input', function() {
+                formatInputCurrency(this);
+                runCalculations();
+            });
+
+            document.getElementById('percentualAdvogado').addEventListener('input', function() {
+                formatPercentage(this);
+                runCalculations();
+            });
+            
+            document.getElementById('parcelasExercicioAnterior').addEventListener('input', runCalculations);
+            document.getElementById('parcelasExercicioAtual').addEventListener('input', runCalculations);
+
+            document.getElementById('numAutores').addEventListener('change', runCalculations);
+
+
+            function updateDigitalClock() {
+                const clockElement = document.getElementById('digitalClock');
+                if (clockElement) {
+                    const now = new Date();
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const seconds = String(now.getSeconds()).padStart(2, '0');
+                    clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+            }
+
+            function updateDate() {
+                const dateElement = document.getElementById('currentDate');
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateElement.textContent = now.toLocaleDateString('pt-BR', options);
+            }
+
+            updateDate();
+            setInterval(updateDigitalClock, 1000);
+            updateDigitalClock();
+            
+            // --- INÍCIO: NOVO CÓDIGO PARA FUNCIONALIDADE IA RRA ---
+            const iaRraButton = document.getElementById('iaRraButton');
+            const iaModal = document.getElementById('iaModal');
+            const closeIaModal = iaModal.querySelector('.close-modal-button');
+            const imageUpload = document.getElementById('imageUpload');
+            const imagePreview = document.getElementById('imagePreview');
+            const analyzeImageButton = document.getElementById('analyzeImageButton');
+            const copyIaDataButton = document.getElementById('copyIaDataButton');
+            const iaSpinner = document.getElementById('iaSpinner');
+            const iaError = document.getElementById('iaError');
+            
+            let uploadedFile = null;
+            let iaResultData = null; // Armazena o resultado da IA
+
+            iaRraButton.addEventListener('click', () => {
+                iaModal.classList.add('active');
+                resetIaModal();
+            });
+
+            closeIaModal.addEventListener('click', () => {
+                iaModal.classList.remove('active');
+            });
+
+            function resetIaModal() {
+                imageUpload.value = null;
+                imagePreview.style.display = 'none';
+                imagePreview.src = '#';
+                analyzeImageButton.disabled = true;
+                copyIaDataButton.disabled = true;
+                iaError.style.display = 'none';
+                iaSpinner.style.display = 'none';
+                uploadedFile = null;
+                iaResultData = null;
+            }
+
+            imageUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    uploadedFile = file;
+                    imagePreview.src = URL.createObjectURL(file);
+                    imagePreview.style.display = 'block';
+                    analyzeImageButton.disabled = false;
+                    iaError.style.display = 'none';
+                }
+            });
+
+            analyzeImageButton.addEventListener('click', async () => {
+                if (!uploadedFile) return;
+
+                iaSpinner.style.display = 'block';
+                iaError.style.display = 'none';
+                analyzeImageButton.disabled = true;
+                copyIaDataButton.disabled = true;
+
+                try {
+                    // !!! IMPORTANTE: Substitua esta função mock pela sua chamada de API real !!!
+                    const result = await mockAnalyzeImage(uploadedFile); 
+                    
+                    // Exemplo de como seria uma chamada real:
+                    // const formData = new FormData();
+                    // formData.append('file', uploadedFile);
+                    // const response = await fetch('URL_DA_SUA_API_DE_IA', { 
+                    //    method: 'POST', 
+                    //    body: formData 
+                    // });
+                    // if (!response.ok) throw new Error('Falha na análise da IA');
+                    // const result = await response.json();
+                    // !!! FIM DO EXEMPLO !!!
+
+                    iaResultData = result; // Salva o resultado temporariamente
+                    
+                    // Preenche os campos na tela principal (fora do modal)
+                    document.getElementById('parcelasExercicioAnterior').value = result.parcelasAnteriores;
+                    document.getElementById('valorTotalAnterior').value = formatCurrency(result.valorTotalAnterior);
+                    document.getElementById('parcelasExercicioAtual').value = result.parcelasAtuais;
+                    document.getElementById('valorTotalAtual').value = formatCurrency(result.valorTotalAtual);
+
+                    runCalculations(); // Roda os cálculos principais
+                    
+                    showToast('Dados do RRA extraídos e preenchidos!');
+                    iaModal.classList.remove('active'); // Fecha o modal após o sucesso
+                    
+                    // --- ATUALIZAÇÃO ---
+                    // Conforme solicitado, limpa os dados da "memória" (variáveis)
+                    // após a conclusão da análise e preenchimento dos campos.
+                    iaResultData = null;
+                    uploadedFile = null;
+                    // --- FIM DA ATUALIZAÇÃO ---
+
+                } catch (error) {
+                    iaError.textContent = `Erro: ${error.message}`;
+                    iaError.style.display = 'block';
+                    analyzeImageButton.disabled = false;
+                } finally {
+                    iaSpinner.style.display = 'none';
+                }
+            });
+
+            copyIaDataButton.addEventListener('click', () => {
+                // Esta variável só terá valor se a análise falhar e o modal continuar aberto.
+                // Para copiar após o sucesso, os dados teriam que ser buscados dos campos.
+                // Mas mantendo a lógica original do botão:
+                if (!iaResultData) {
+                    // Pega os dados dos campos principais se a variável já foi limpa
+                    const pAnt = document.getElementById('parcelasExercicioAnterior').value;
+                    const vAnt = document.getElementById('valorTotalAnterior').value;
+                    const pAtu = document.getElementById('parcelasExercicioAtual').value;
+                    const vAtu = document.getElementById('valorTotalAtual').value;
+                    
+                     const textToCopy = `Parcelas Anteriores: ${pAnt}\n` +
+                                     `Valor Anterior: ${vAnt}\n` +
+                                     `Parcelas Atuais: ${pAtu}\n` +
+                                     `Valor Atual: ${vAtu}`;
+                    
+                     navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('Dados copiados para a área de transferência.');
+                    }).catch(err => {
+                        showToast('Erro ao copiar dados.');
+                    });
+                    
+                } else {
+                     const textToCopy = `Parcelas Anteriores: ${iaResultData.parcelasAnteriores}\n` +
+                                     `Valor Anterior: ${formatCurrency(iaResultData.valorTotalAnterior)}\n` +
+                                     `Parcelas Atuais: ${iaResultData.parcelasAtuais}\n` +
+                                     `Valor Atual: ${formatCurrency(iaResultData.valorTotalAtual)}`;
+                    
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('Dados da IA copiados para a área de transferência.');
+                    }).catch(err => {
+                        showToast('Erro ao copiar dados.');
+                    });
+                }
+            });
+
+            /**
+             * --- FUNÇÃO DE SIMULAÇÃO (MOCK) ---
+             * Esta função simula uma chamada de API.
+             * SUBSTITUA ESTA FUNÇÃO por uma chamada `fetch` real para seu back-end.
+             */
+            async function mockAnalyzeImage(file) {
+                console.log(`Simulando análise do arquivo: ${file.name}`);
+                
+                // Simula um delay da rede/IA
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Simula um erro aleatório (20% de chance)
+                if (Math.random() < 0.2) {
+                     throw new Error('Formato de imagem não reconhecido (simulação).');
+                }
+
+                // Retorna os dados da "Planilha 2.pdf" como exemplo
+                // A IA real faria a lógica de OCR e as regras de negócio
+                return {
+                    parcelasAnteriores: 7,
+                    valorTotalAnterior: 10493.70,
+                    parcelasAtuais: 3,
+                    valorTotalAtual: 3783.62
+                };
+            }
+            // --- FIM: NOVO CÓDIGO PARA FUNCIONALIDADE IA RRA ---
+
+
+            // --- INÍCIO: CÓDIGO DA CALCULADORA (Sem alterações) ---
+            const calculator = {
+                displayValue: '0',
+                firstOperand: null,
+                waitingForSecondOperand: false,
+                operator: null,
+                history: ''
+            };
+
+            const display = document.getElementById('calculatorDisplay');
+            const historyDisplay = document.getElementById('calculatorHistory');
+            const keys = document.querySelector('.calculator-keys');
+            
+            function updateDisplay() {
+                historyDisplay.value = calculator.history;
+                let value = calculator.displayValue;
+                
+                if (value === 'Erro') {
+                    display.value = 'Erro';
+                    return;
+                }
+                
+                value = String(value).replace('.', ',');
+                
+                let [integerPart, decimalPart] = value.split(',');
+
+                if (integerPart) {
+                    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                }
+
+                display.value = decimalPart !== undefined ? `${integerPart},${decimalPart}` : integerPart;
+            }
+
+
+            updateDisplay();
+
+            keys.addEventListener('click', (event) => {
+                const { target } = event;
+                if (!target.matches('button')) return;
+                
+                const { value } = target;
+
+                switch (value) {
+                    case '+':
+                    case '-':
+                    case '*':
+                    case '/':
+                        handleOperator(value);
+                        break;
+                    case '%':
+                        handlePercentage();
+                        break;
+                    case '=':
+                        handleEqual();
+                        break;
+                    case ',':
+                        inputDecimal();
+                        break;
+                    case 'clear':
+                        resetCalculator();
+                        break;
+                    case 'backspace':
+                        inputBackspace();
+                        break;
+                    default:
+                        if (/\d/.test(value)) {
+                            inputDigit(value);
+                        }
+                }
+                updateDisplay();
+            });
+            
+            display.addEventListener('click', () => {
+                const valueToCopy = display.value;
+                 if (valueToCopy && valueToCopy !== '0') {
+                    const cleanValue = valueToCopy.replace(/\./g, '').replace(',', '.');
+                    navigator.clipboard.writeText(cleanValue).then(() => {
+                         showToast('Valor copiado: ' + valueToCopy);
+                    }).catch(err => {
+                         showToast('Erro ao copiar.');
+                    });
+                }
+            });
+
+
+            function inputDigit(digit) {
+                const { displayValue, waitingForSecondOperand } = calculator;
+                if (waitingForSecondOperand === true) {
+                    calculator.displayValue = digit;
+                    calculator.waitingForSecondOperand = false;
+                } else {
+                    calculator.displayValue = displayValue === '0' ? digit : displayValue + digit;
+                }
+            }
+
+            function inputDecimal() {
+                if (calculator.waitingForSecondOperand) {
+                    calculator.displayValue = '0.';
+                    calculator.waitingForSecondOperand = false;
+                    return;
+                }
+                if (!calculator.displayValue.includes('.')) {
+                    calculator.displayValue += '.';
+                }
+            }
+            
+            function inputBackspace() {
+                if(calculator.waitingForSecondOperand) return;
+                calculator.displayValue = calculator.displayValue.slice(0, -1) || '0';
+            }
+            
+            function parseDisplayValue() {
+                return parseFloat(calculator.displayValue);
+            }
+
+            function handleOperator(nextOperator) {
+                const { firstOperand, displayValue, operator } = calculator;
+                const inputValue = parseDisplayValue();
+
+                if (operator && calculator.waitingForSecondOperand) {
+                    calculator.operator = nextOperator;
+                     calculator.history = `${formatForHistory(firstOperand)} ${nextOperator} `;
+                    return;
+                }
+
+                if (firstOperand == null && !isNaN(inputValue)) {
+                    calculator.firstOperand = inputValue;
+                } else if (operator) {
+                    const result = performCalculation[operator](firstOperand, inputValue);
+                    calculator.displayValue = String(result);
+                    calculator.firstOperand = result;
+                }
+                
+                calculator.history = `${formatForHistory(calculator.firstOperand)} ${nextOperator} `;
+                calculator.waitingForSecondOperand = true;
+                calculator.operator = nextOperator;
+            }
+
+            function handlePercentage() {
+                const { firstOperand, displayValue, operator } = calculator;
+                let currentValue = parseDisplayValue();
+
+                if (firstOperand !== null && (operator === '*' || operator === '/')) {
+                     const percentValue = (firstOperand * currentValue) / 100;
+                     calculator.displayValue = String(parseFloat(percentValue.toFixed(2)));
+                } else if (firstOperand !== null && (operator === '+' || operator === '-')) {
+                    const percentValue = (firstOperand * currentValue) / 100;
+                    calculator.displayValue = String(parseFloat(percentValue.toFixed(2)));
+                } else {
+                    calculator.displayValue = String(currentValue / 100);
+                }
+                 calculator.waitingForSecondOperand = true;
+            }
+            
+            function formatForHistory(value) {
+                if (value === null) return '';
+                return value.toLocaleString('pt-BR', {maximumFractionDigits: 10});
+            }
+
+            function handleEqual() {
+                const { firstOperand, displayValue, operator } = calculator;
+                if (operator && !calculator.waitingForSecondOperand) {
+                    const secondOperand = parseDisplayValue();
+                    
+                    calculator.history = `${formatForHistory(firstOperand)} ${operator} ${formatForHistory(secondOperand)} =`;
+                    
+                    if (secondOperand === 0 && operator === '/') {
+                        calculator.displayValue = 'Erro';
+                        resetCalculatorPostError();
+                        return;
+                    }
+
+                    const result = performCalculation[operator](firstOperand, secondOperand);
+                    
+                    calculator.displayValue = String(parseFloat(result.toFixed(2)));
+                    calculator.firstOperand = null;
+                    calculator.operator = null;
+                    calculator.waitingForSecondOperand = true;
+                }
+            }
+            
+            const performCalculation = {
+                '/': (firstOperand, secondOperand) => firstOperand / secondOperand,
+                '*': (firstOperand, secondOperand) => firstOperand * secondOperand,
+                '+': (firstOperand, secondOperand) => firstOperand + secondOperand,
+                '-': (firstOperand, secondOperand) => firstOperand - secondOperand,
+            };
+
+            function resetCalculator() {
+                calculator.displayValue = '0';
+                calculator.firstOperand = null;
+                calculator.waitingForSecondOperand = false;
+                calculator.operator = null;
+                calculator.history = '';
+            }
+             function resetCalculatorPostError() {
+                calculator.firstOperand = null;
+                calculator.waitingForSecondOperand = true;
+                calculator.operator = null;
+            }
+            // --- FIM: CÓDIGO DA CALCULADORA ---
+
+        });
+
+        document.getElementById('total').setAttribute('readonly', 'readonly');
+        document.getElementById('valorTotalAnterior').setAttribute('readonly', 'readonly');
+        document.getElementById('valorTotalAtual').setAttribute('readonly', 'readonly');
+    </script>
+</body>
+</html>
