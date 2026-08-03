@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora RPV´s / Precatórios</title>
+    <!-- Importando fonte moderna e limpa (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             box-sizing: border-box;
             overflow-x: hidden;
+            background-color: #f4f6f8; /* Fundo mais moderno e leve */
+            color: #374151; /* Texto principal chumbo/grafite */
         }
         *, *::before, *::after {
             box-sizing: inherit;
@@ -20,30 +26,26 @@
         body {
             display: flex;
             flex-direction: column;
-            background-color: #F5F5DC;
         }
 
         header {
             position: relative;
             flex-shrink: 0;
             text-align: center;
-            padding: 0.8em 0;
-            background-color: #f0f0f0;
-            border-bottom: 1px solid #ccc;
+            padding: 1em 0;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .header-title {
-            font-size: clamp(2em, 5vw, 2.8em);
-            color: #000080;
-            font-weight: bold;
+            font-size: clamp(1.8em, 4vw, 2.5em);
+            color: #1e3a8a; /* Azul escuro corporativo */
+            font-weight: 700;
             margin: 0;
-            text-shadow:
-                0.05em 0.05em 0px rgba(0, 0, 0, 0.2),
-                0.1em 0.1em 0.15em rgba(0, 0, 0, 0.3);
-            letter-spacing: 0.03em;
+            letter-spacing: -0.02em;
             padding: 0 10px;
         }
         
@@ -56,10 +58,10 @@
 
         #digitalClock {
             font-family: 'Courier New', Courier, monospace;
-            font-size: clamp(1.5em, 4vw, 2.2em);
-            font-weight: bold;
-            color: #000080;
-            text-shadow: 1px 1px 0px #ccc, 2px 2px 3px rgba(0,0,0,0.4);
+            font-size: clamp(1.2em, 3vw, 1.8em);
+            font-weight: 600;
+            color: #4b5563;
+            margin: 0;
         }
 
         #header-right {
@@ -70,9 +72,10 @@
         }
 
         #currentDate {
-            font-size: clamp(0.8em, 2vw, 1em);
-            font-weight: bold;
-            color: #000080;
+            font-size: clamp(0.85em, 2vw, 1em);
+            font-weight: 500;
+            color: #4b5563;
+            margin: 0;
         }
 
         .main-content-wrapper {
@@ -80,94 +83,86 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: flex-start;
-            width: 98%;
-            margin: 10px auto;
-            gap: 15px;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            align-items: stretch; /* Modificado para fazer todas as colunas terem a mesma altura */
+            width: fit-content; /* Faz a caixa branca abraçar exatamente as colunas */
+            max-width: 98%;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
         }
 
         .left-column-wrapper, .form-section, .results-section, .links-section {
-            flex: 1 1 280px;
-            min-width: 260px;
+            flex: 0 1 auto; /* Impede que as colunas estiquem sozinhas e criem buracos */
+            width: 100%;
             padding: 10px; 
             box-sizing: border-box;
+        }
+
+        /* Alinhamento da Coluna Esquerda: Espaça o topo (botões) e a base (calculadora) */
+        .left-column-wrapper {
+            max-width: 280px; /* Limite de largura focado na coluna esquerda */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         
         .left-column-content {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
         
-        .info-box {
-            background-color: #ADD8E6;
-            border: 1px solid #90B0C0;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 
-                4px 4px 0px rgba(0, 0, 0, 0.2),
-                8px 8px 10px rgba(0, 0, 0, 0.15),
-                -2px -2px 5px rgba(255, 255, 255, 0.5) inset;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .info-box:hover {
-            transform: translateY(-3px);
-            box-shadow: 
-                6px 6px 0px rgba(0, 0, 0, 0.25),
-                10px 10px 15px rgba(0, 0, 0, 0.2),
-                -2px -2px 5px rgba(255, 255, 255, 0.6) inset;
-        }
-
         .form-section {
             max-width: 420px;
             padding-top: 10px;
         }
         
         .results-section {
-            border-left: 1px solid #eee;
+            border-left: 1px solid #f3f4f6;
             min-height: 150px;
             padding-top: 10px;
-            max-width: 320px; /* Largura reduzida para acomodar a coluna de links */
+            padding-left: 20px;
+            max-width: 320px;
         }
 
         .links-section {
-            border-left: 1px solid #eee;
+            border-left: 1px solid #f3f4f6;
             min-height: 150px;
             padding-top: 10px;
-            max-width: 250px; /* Largura ideal para os botões de links */
+            padding-left: 20px;
+            max-width: 250px;
         }
 
         .section-main-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #000080;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #1e3a8a;
             text-align: center;
             margin-top: 1.5em;
             margin-bottom: 1em;
             width: 100%;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.05em;
         }
         .form-section .section-main-title:first-of-type {
             margin-top: 0.5em;
         }
         
         .results-section h3, .links-section h3 {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #000080;
+            font-size: 1em;
+            font-weight: 700;
+            color: #1e3a8a;
             margin-top: 1.5em; 
-            margin-bottom: 0.8em;
+            margin-bottom: 1em;
             text-align: center;
             width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .results-section h3:first-of-type {
@@ -175,114 +170,74 @@
         }
         
         .results-field-group {
-            margin-bottom: 0.8em;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .results-field-group label {
-            margin-bottom: 0.2em;
-            font-weight: bold;
-            font-size: 0.9em;
-            color: black;
-            width: 100%;
-        }
-        .results-field-group input {
-            width: 100%;
-            padding: 0.6em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
-            background-color: #fff;
-            color: #000080;
-            font-weight: bold;
-            transition: border-color 0.3s;
-        }
-        .results-field-group input:focus {
-            outline: none;
-            border-color: #000080;
-        }
-
-        .info-title {
-            font-size: clamp(1.1em, 3vw, 1.4em);
-            font-weight: bold;
-            color: #00008B;
-            margin-top: 0;
-            margin-bottom: 0.8em;
-            line-height: 1.2;
-            text-align: left;
-        }
-        .info-text {
-            color: #00008B;
-            text-align: justify;
-            line-height: 1.5;
-            margin-bottom: 0.6em;
-            font-size: clamp(0.85em, 2.5vw, 0.95em);
-            font-weight: bold;
-        }
-        .info-text strong {
-            color: #00008B;
-            text-decoration: underline;
-        }
-        
-        .form-group {
             margin-bottom: 1em;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
         }
-        .form-group label {
-            margin-bottom: 0.3em;
-            font-weight: bold;
+        .results-field-group label {
+            margin-bottom: 0.4em;
+            font-weight: 600;
+            font-size: 0.85em;
+            color: #4b5563;
             width: 100%;
-            color: #333;
+        }
+        .results-field-group input {
+            width: 100%;
+            padding: 0.75em;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.95em;
+            background-color: #f9fafb;
+            color: #1e3a8a;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2em;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .form-group label {
+            margin-bottom: 0.4em;
+            font-weight: 600;
+            font-size: 0.85em;
+            width: 100%;
+            color: #374151;
         }
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 0.6em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 0.75em;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-size: 0.95em;
-            background-color: #fff;
-            color: #000080;
-            font-weight: bold;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #f9fafb;
+            color: #1e3a8a;
+            font-weight: 600;
+            transition: all 0.2s;
         }
-        .form-group input:focus, .form-group select:focus {
+        
+        .form-group input:focus, .form-group select:focus, .results-field-group input:focus {
             outline: none;
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            border-color: #3b82f6;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
-        /* Nova Classe para alinhar campos lado a lado */
         .double-field-row {
             display: flex;
             gap: 15px;
             width: 100%;
-            margin-bottom: 0.8em;
-            align-items: flex-end; /* Garante o alinhamento pela base dos inputs */
+            margin-bottom: 1.2em;
+            align-items: flex-end; 
         }
         .double-field-row .form-group, 
         .double-field-row .results-field-group {
             flex: 1;
             margin-bottom: 0;
-        }
-
-        /* Classe para alinhar Labels e Inputs lado a lado (RRA) */
-        .form-group.rra-inline-group {
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-        }
-        .form-group.rra-inline-group label {
-            width: auto;
-            margin-bottom: 0;
-            white-space: nowrap;
-        }
-        .form-group.rra-inline-group input {
-            flex: 1;
-            width: 100%;
         }
 
         .author-count-group {
@@ -292,70 +247,61 @@
             justify-content: center;
             gap: 10px;
             font-size: 0.9em;
-            margin-bottom: 1em;
+            margin-bottom: 1.5em;
         }
         .author-count-group label {
-            color: #006400;
-            font-weight: bold;
+            color: #047857;
+            font-weight: 600;
             width: auto;
             margin-bottom: 0;
         }
         .author-count-group select {
-            color: #006400;
-            font-weight: bold;
+            color: #047857;
+            font-weight: 600;
             width: auto;
             max-width: 80px;
             margin: 0;
-            padding: 0.4em;
+            padding: 0.5em;
+            background-color: #ecfdf5;
+            border-color: #a7f3d0;
         }
 
-        /* Estilos para as opções SIREA / ORACLE */
         .rra-options {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 30px;
-            margin-bottom: 1em;
-            margin-top: 1.5em; /* Espaçamento ajustado */
-            background-color: #e8e8e8;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            margin-bottom: 1.5em;
+            margin-top: 2em; 
+            background-color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
         }
         .rra-options label {
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            font-weight: bold;
-            color: #000080;
+            font-weight: 600;
+            color: #1f2937;
             margin-bottom: 0;
             width: auto;
-            font-size: 1.1em;
+            font-size: 1em;
         }
         .rra-options input[type="radio"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             margin: 0;
             cursor: pointer;
-            accent-color: #000080;
+            accent-color: #2563eb;
         }
 
         .rra-fields {
             display: block;
             margin-top: 1em;
-            padding-top: 1em;
-            border-top: 1px dashed #aaa;
-        }
-
-        .rra-row {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-        }
-
-        .rra-row .form-group {
-            flex: 1;
+            padding-top: 1.5em;
+            border-top: 1px dashed #d1d5db;
         }
 
         .button-container {
@@ -363,116 +309,205 @@
             grid-template-columns: 1fr 1fr;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 1.5em;
+            margin-bottom: 2em;
         }
 
-        /* Override específico para o botão de apagar na seção de formulário e links */
         .form-section .button-container, .links-section .button-container {
             display: flex;
             justify-content: center;
         }
 
+        /* Regra específica para empilhar e reduzir botões na coluna da esquerda */
+        .left-column-wrapper .button-container {
+            display: flex;
+            flex-direction: column; /* Empilha verticalmente */
+            align-items: center; /* Centraliza */
+            gap: 12px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .left-column-wrapper .action-button {
+            width: 85%; /* Reduz a largura */
+            max-width: 250px;
+            min-height: 42px; /* Reduz a altura */
+            padding: 10px;
+            font-size: 0.75em; /* Diminui a fonte levemente */
+            flex-grow: 0;
+        }
+
         .action-button {
-            background-color: #ADD8E6;
-            color: #000080;
-            border: 1px solid #90B0C0;
+            background-color: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
             border-radius: 8px;
             padding: 12px 10px;
-            font-weight: bold;
-            font-size: 0.85em; /* Ligeiramente menor para caber melhor */
+            font-weight: 600;
+            font-size: 0.85em; 
             cursor: pointer;
-            box-shadow: 
-                inset 0px 1px 1px rgba(255,255,255,0.7),
-                3px 3px 5px rgba(0,0,0,0.2);
-            text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
-            transition: all 0.1s ease-in-out;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
             text-align: center;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 60px; /* Altura mínima para uniformidade */
-            flex-grow: 1; /* Garante que ocupe o espaço disponível */
+            min-height: 60px; 
+            flex-grow: 1; 
+            letter-spacing: 0.02em;
         }
         
         .action-button.red-text {
-            color: #d32f2f; /* Vermelho mais elegante */
+            background-color: #fef2f2;
+            color: #b91c1c; 
+            border-color: #fecaca;
         }
 
         .action-button:hover:not(:disabled) {
-            filter: brightness(105%);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
         .action-button:disabled {
-            background-color: #a9a9a9;
-            color: #e0e0e0;
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            border-color: #e5e7eb;
             cursor: not-allowed;
-            opacity: 0.7;
             box-shadow: none;
-            text-shadow: none;
         }
 
         .action-button:active:not(:disabled) {
-            transform: translateY(2px);
-            box-shadow: 
-                inset 0px 1px 2px rgba(0,0,0,0.3),
-                1px 1px 2px rgba(0,0,0,0.3);
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        /* Estilo Yellow Badge para ORACLE / SIREA, Tabelas Iniciais no modal e botão Limpar */
         .badge-yellow {
-            background-color: #FFD700; /* Amarelo */
-            color: #000080; /* Azul Marinho */
-            border: 1px solid #DAA520; /* Borda Dourada */
+            background-color: #fef08a; 
+            color: #854d0e; 
+            border: 1px solid #fde047; 
             border-radius: 8px;
-            padding: 8px 0; /* Padding vertical, o horizontal fica por conta da largura fixa */
-            font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 
-                inset 0px 1px 1px rgba(255,255,255,0.7),
-                3px 3px 5px rgba(0,0,0,0.2);
-            text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
+            padding: 10px 0; 
+            font-weight: 700;
+            font-size: 0.85em;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             text-transform: uppercase;
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            width: 110px; /* LARGURA FIXA PARA ALINHAMENTO PERFEITO */
+            width: 120px; 
             box-sizing: border-box;
             cursor: pointer;
-            transition: all 0.1s ease-in-out;
+            transition: all 0.2s ease;
+            letter-spacing: 0.02em;
         }
 
         .badge-yellow:hover:not(:disabled) {
-            filter: brightness(105%);
+            background-color: #fde047;
             transform: translateY(-1px);
         }
 
-        .badge-yellow:active:not(:disabled) {
-            transform: translateY(2px);
-            box-shadow: 
-                inset 0px 1px 2px rgba(0,0,0,0.3),
-                1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        /* Estilo Blue Badge para o RRA no modal e aba inicial */
         .badge-blue {
-            background-color: #ADD8E6; /* Azul claro do botão */
-            color: #000080; /* Azul Marinho */
-            border: 1px solid #90B0C0; /* Borda alinhada com o botão */
+            background-color: #dbeafe; 
+            color: #1e40af; 
+            border: 1px solid #bfdbfe; 
             border-radius: 8px;
-            padding: 8px 0;
-            font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 
-                inset 0px 1px 1px rgba(255,255,255,0.7),
-                3px 3px 5px rgba(0,0,0,0.2);
-            text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
+            padding: 10px 0;
+            font-weight: 700;
+            font-size: 0.85em;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             text-transform: uppercase;
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            width: 110px; /* LARGURA FIXA PARA ALINHAMENTO PERFEITO com ORACLE/SIREA */
+            width: 120px; 
             box-sizing: border-box;
+            letter-spacing: 0.02em;
+        }
+
+        .calculator {
+            flex: 1;
+            width: 100%;
+            min-width: 250px;
+            max-width: 300px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            margin: 0 auto;
+        }
+        .calculator-display-container {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .calculator-history {
+            width: 100%;
+            text-align: right;
+            font-size: 0.85em;
+            color: #6b7280;
+            height: 20px;
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .calculator-display {
+            width: 100%;
+            text-align: right;
+            font-size: 2.2em;
+            border: none;
+            background: none;
+            color: #111827;
+            cursor: pointer;
+            font-weight: 600;
+            padding-top: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+        .calculator-keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .calculator-keys button {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.1s;
+            color: #374151;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .calculator-keys button:hover {
+            background-color: #f3f4f6;
+        }
+        .calculator-keys button:active {
+            background-color: #e5e7eb;
+            transform: scale(0.98);
+        }
+        .calculator-keys .operator {
+            background-color: #f3f4f6;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        .calculator-keys .equal-sign {
+            background-color: #10b981;
+            color: white;
+            border-color: #059669;
+        }
+        .calculator-keys .equal-sign:hover {
+            background-color: #059669;
+        }
+        .calculator-keys .clear {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
+        }
+        .calculator-keys .clear:hover {
+            background-color: #dc2626;
         }
 
         .modal-overlay {
@@ -482,8 +517,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -492,29 +527,27 @@
             display: flex;
         }
         .modal-content {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
             text-align: center;
             width: 90%;
-            max-width: 450px;
+            max-width: 480px;
             position: relative;
             animation: modalFadeIn 0.3s ease-out;
+            border: 1px solid #e5e7eb;
         }
         
-        /* Estilo Específico para o Modal de Histórico */
         .modal-content-historic {
-            background-color: #f4f4f4; /* Cinza claro moderno */
-            color: #000080; /* Azul Marinho */
-            max-width: 700px; /* Mais largo para caber a tabela */
+            max-width: 700px; 
         }
         
         .historic-table-container {
             max-height: 60vh;
             overflow-y: auto;
             border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
             margin-bottom: 20px;
         }
 
@@ -524,32 +557,29 @@
             font-size: 0.95em;
         }
         .historic-table th {
-            background-color: #000080;
-            color: white;
+            background-color: #f9fafb;
+            color: #4b5563;
             padding: 12px;
             position: sticky;
             top: 0;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.85em;
-            letter-spacing: 0.5px;
+            font-size: 0.8em;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #e5e7eb;
         }
         .historic-table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            color: #000080;
+            padding: 12px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #1f2937;
             font-weight: 500;
         }
-        .historic-table tr:nth-child(even) {
-            background-color: #e8e8e8;
-        }
         .historic-table tr:hover {
-            background-color: #dceefc;
+            background-color: #f3f4f6;
         }
-
 
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -560,25 +590,28 @@
         }
         .modal-content h2, .modal-content h3 {
             margin-top: 0;
-            color: #000080;
+            color: #1e3a8a;
             font-size: 1.4em;
-            margin-bottom: 1em;
+            margin-bottom: 1.2em;
+            font-weight: 700;
         }
         .modal-content h3 {
-            font-size: 1.2em;
+            font-size: 1.1em;
             margin-top: 1em;
+            text-transform: uppercase;
         }
         .modal-content p {
-            font-size: 1.1em;
-            color: #333;
+            font-size: 1.05em;
+            color: #4b5563;
             margin-top: 0;
             margin-bottom: 20px;
+            line-height: 1.5;
         }
         .modal-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            flex-wrap: wrap; /* Adicionado para garantir que botões não fujam do modal */
+            flex-wrap: wrap; 
         }
         .modal-desagio-results {
             display: flex;
@@ -591,54 +624,58 @@
         .modal-button {
             padding: 12px 24px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             transition: all 0.2s;
             flex-grow: 1;
             font-size: 0.95em;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .modal-button:hover:not(:disabled) {
             opacity: 0.9;
             transform: translateY(-1px);
         }
         .modal-button.sim {
-            background-color: #2e7d32;
+            background-color: #10b981;
             color: white;
         }
         .modal-button.nao {
-            background-color: #c62828;
-            color: white;
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .modal-button.nao:hover {
+            background-color: #e5e7eb;
         }
         .modal-button.copiar {
-            background-color: #000080;
+            background-color: #2563eb;
             color: white;
         }
         .modal-button:disabled {
-            background-color: #a9a9a9;
+            background-color: #d1d5db;
+            color: #6b7280;
             cursor: not-allowed;
-            opacity: 0.7;
+            transform: none;
         }
         
         .close-modal-button {
             position: absolute;
             top: 15px;
             right: 20px;
-            font-size: 30px;
-            font-weight: bold;
-            color: #aaa;
+            font-size: 28px;
+            font-weight: 400;
+            color: #9ca3af;
             cursor: pointer;
-            line-height: 0.8;
+            line-height: 1;
             transition: color 0.2s;
         }
         .close-modal-button:hover {
-            color: #c62828;
+            color: #ef4444;
         }
         .modal-content hr {
             border: 0;
-            border-top: 1px solid #eee;
-            margin: 20px 0;
+            border-top: 1px solid #e5e7eb;
+            margin: 25px 0;
         }
         
         #detalhamentoModal h2 {
@@ -653,95 +690,20 @@
             margin-bottom: 20px;
         }
         #detalhamentoModal th, #detalhamentoModal td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 10px;
             text-align: center;
         }
         #detalhamentoModal td {
             cursor: pointer;
         }
         #detalhamentoModal th {
-            background-color: #f2f2f2;
-            color: #000080;
-            font-weight: bold;
+            background-color: #f9fafb;
+            color: #4b5563;
+            font-weight: 600;
         }
         #detalhamentoModal td {
-            color: #333;
-        }
-
-        .calculator {
-            flex: 1;
-            min-width: 250px;
-            max-width: 300px;
-            background-color: #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 
-                8px 8px 16px #bebebe, 
-                -8px -8px 16px #ffffff;
-        }
-        .calculator-display-container {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 20px;
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1);
-        }
-        .calculator-history {
-            width: 100%;
-            text-align: right;
-            font-size: 0.8em;
-            color: #888;
-            height: 20px;
-            border: none;
-            background: none;
-        }
-        .calculator-display {
-            width: 100%;
-            text-align: right;
-            font-size: 2em;
-            border: none;
-            background: none;
-            color: #333;
-            cursor: pointer;
-        }
-        .calculator-keys {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-        .calculator-keys button {
-            padding: 15px;
-            border-radius: 8px;
-            border: none;
-            background-color: #f0f0f0;
-            font-size: 1.2em;
-            cursor: pointer;
-            box-shadow: 
-                3px 3px 6px #bebebe, 
-                -3px -3px 6px #ffffff;
-            transition: all 0.1s;
-            color: #333;
-            font-weight: bold;
-        }
-        .calculator-keys button:active {
-            box-shadow: inset 2px 2px 5px #bebebe, inset -2px -2px 5px #ffffff;
-        }
-        .calculator-keys .operator {
-            background-color: #e0e0e0;
-            color: black;
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
-        }
-        .calculator-keys .equal-sign {
-            background-color: #43a047;
-            color: white;
-             box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
-        }
-        .calculator-keys .clear {
-            background-color: #e53935;
-            color: white;
-             box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            color: #1f2937;
         }
 
         .toast-message {
@@ -749,25 +711,25 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #333;
+            background-color: #1f2937;
             color: #fff;
-            padding: 12px 25px;
+            padding: 14px 28px;
             border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             z-index: 2000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.5s;
-            font-weight: bold;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95em;
         }
 
         .toast-message.show {
             opacity: 1;
             visibility: visible;
-            bottom: 50px;
+            bottom: 40px;
         }
 
-        /* Ajustes para telas médias (Tablets) */
         @media (max-width: 1024px) {
             #header-left, #header-right {
                 display: none;
@@ -775,15 +737,18 @@
             .main-content-wrapper {
                 flex-direction: column;
                 width: 94%;
-                padding: 10px;
+                padding: 15px;
                 gap: 20px;
             }
             .left-column-wrapper, .form-section, .results-section, .links-section {
                 max-width: 100%;
                 padding: 0;
                 border: none;
-                border-bottom: 1px solid #eee;
+                border-bottom: 1px solid #e5e7eb;
                 padding-bottom: 20px;
+            }
+            .left-column-wrapper {
+                justify-content: flex-start;
             }
             .left-column-content {
                 flex-direction: column;
@@ -791,22 +756,22 @@
             }
             .results-section, .links-section {
                 border-bottom: none;
-            }
-            .info-box {
-                width: 100%;
-                box-shadow: none;
-                border: 1px solid #ccc;
+                padding-left: 0;
             }
             .modal-content-large {
                 width: 95%;
                 max-width: 95%;
             }
+            /* Em telas menores, o botão pode voltar a ser mais largo */
+            .left-column-wrapper .action-button {
+                width: 100%;
+                max-width: 100%;
+            }
         }
 
-        /* Ajustes para telas pequenas (Celulares) */
         @media (max-width: 600px) {
             header {
-                padding: 0.5em 10px;
+                padding: 1em 10px;
             }
             .header-title {
                 font-size: clamp(1.4em, 6vw, 2em);
@@ -816,35 +781,31 @@
                 border: none;
                 background-color: transparent;
                 box-shadow: none;
+                padding: 10px;
             }
-            .rra-row, .double-field-row {
+            .double-field-row {
                 flex-direction: column;
-                gap: 10px;
-            }
-            .form-group.rra-inline-group {
-                gap: 5px;
-            }
-            .form-group.rra-inline-group label {
-                font-size: 0.8em;
+                gap: 15px;
             }
             .button-container {
                 grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .left-column-wrapper .button-container {
                 gap: 10px;
             }
             .left-column-wrapper, .form-section, .results-section, .links-section {
-                background-color: #fff;
-                padding: 15px;
-                border-radius: 8px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-                margin-bottom: 10px;
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                margin-bottom: 15px;
+                border-bottom: none;
             }
             .calculator {
                 width: 100%;
                 max-width: 100%;
             }
-             .calculator-keys button {
-                padding: 20px; 
-             }
         }
     </style>
 </head>
@@ -862,31 +823,12 @@
     <div class="main-content-wrapper">
         <div class="left-column-wrapper">
              <div class="button-container">
-                 <button id="historicoTetoButton" class="action-button red-text">TETO DO JEF ANOS ANTERIORES (2016 - 2025)</button>
-                 
+                 <button id="historicoTetoButton" class="action-button red-text">TETO DO JEF ANOS ANTERIORES (2016 - 2026)</button>
                  <button id="rpaTetoButton" class="action-button">CÁLCULO RPV ACIMA DO TETO</button>
                  <button id="naoTenhoJurosButton" class="action-button">NÃO TENHO O VALOR DOS JUROS (R$)</button>
                  <button id="desagioButton" class="action-button">CÁLCULO DESÁGIO (R$):</button>
             </div>
             <div class="left-column-content">
-                <div class="info-box"> 
-                    <h2 class="info-title">Informações importantes:</h2>
-                    <p class="info-text">
-                        1. Atualmente, o valor limite para expedição de RPV é de <strong>R$ 97.260,00 (noventa e sete mil e duzentos e sessenta reais)</strong> que equivale a 60 (sessenta) salários-mínimos;
-                    </p>
-                    <p class="info-text">
-                        2. O precatório é emitido nos casos de condenações envolvendo valores acima de 60 (sessenta) salários mínimos;
-                    </p>
-                    <p class="info-text">
-                        3. O pagamento de RPVs deve ocorrer em até 60 dias após a expedição da requisição, segundo a Justiça Federal;
-                    </p>
-                    <p class="info-text">
-                        4. O pagamento de precatórios é feito por ordem cronológica de apresentação e pode levar mais tempo, pois envolve a programação orçamentária anual.
-                    </p>
-                    <p class="info-text">
-                        5. Valor atual do Salário mínimo é de <strong>R$ 1.621,00 (um mil seiscentos e vinte e um reais) - Ano 2026</strong>.
-                    </p>
-                </div>
                 <div class="calculator">
                     <div class="calculator-display-container">
                         <input type="text" class="calculator-history" id="calculatorHistory" readonly>
@@ -949,7 +891,7 @@
                     </div>
                 </div>
                 
-                <div class="form-group rra-inline-group" style="margin-top: 15px; margin-bottom: 15px;">
+                <div class="form-group" style="margin-top: 15px; margin-bottom: 15px;">
                     <label for="sucumbenciaPerc">Sucumbência (Perc. %):</label>
                     <input type="text" id="sucumbenciaPerc" name="sucumbenciaPerc" placeholder="0%" inputmode="numeric">
                 </div>
@@ -958,7 +900,7 @@
                      <button type="button" id="clearButton" class="badge-yellow" style="width: 100%; border: none; padding: 12px 10px; text-transform: uppercase;">LIMPAR DADOS</button>
                 </div>
 
-                <div class="rra-options" style="margin-top: 25px;">
+                <div class="rra-options">
                     <span class="badge-blue" style="margin-right: 15px;">RRA</span>
                     <label>
                         <input type="radio" name="rraBaseType" value="ORACLE" checked> ORACLE
@@ -969,23 +911,23 @@
                 </div>
 
                 <div id="rraFields" class="rra-fields">
-                    <div class="rra-row">
-                        <div class="form-group rra-inline-group">
-                            <label for="parcelasExercicioAnterior">Parc. Exerc. Ant.:</label>
+                    <div class="double-field-row">
+                        <div class="form-group">
+                            <label for="parcelasExercicioAnterior">Parc. Ex. Ant.:</label>
                             <input type="text" id="parcelasExercicioAnterior" name="parcelasExercicioAnterior" placeholder="0" inputmode="numeric">
                         </div>
-                        <div class="form-group rra-inline-group">
-                            <label for="valorTotalAnterior">Valor Total:</label>
+                        <div class="form-group">
+                            <label for="valorTotalAnterior">Total Ant.:</label>
                             <input type="text" id="valorTotalAnterior" name="valorTotalAnterior" placeholder="R$ 0,00" readonly>
                         </div>
                     </div>
-                    <div class="rra-row">
-                        <div class="form-group rra-inline-group">
-                            <label for="parcelasExercicioAtual">Parc. Exerc. Atual:</label>
+                    <div class="double-field-row">
+                        <div class="form-group">
+                            <label for="parcelasExercicioAtual">Parc. Ex. Atual:</label>
                             <input type="text" id="parcelasExercicioAtual" name="parcelasExercicioAtual" placeholder="0" inputmode="numeric">
                         </div>
-                        <div class="form-group rra-inline-group">
-                            <label for="valorTotalAtual">Valor Total:</label>
+                        <div class="form-group">
+                            <label for="valorTotalAtual">Total Atual:</label>
                             <input type="text" id="valorTotalAtual" name="valorTotalAtual" placeholder="R$ 0,00" readonly>
                         </div>
                     </div>
@@ -1055,13 +997,11 @@
             </div>
         </div>
 
-        <!-- NOVA COLUNA: LINKS ÚTEIS (Alinhada horizontalmente com o botão LIMPAR DADOS) -->
         <div class="links-section">
-            <h3 class="action-button" style="margin-top: 1.5em; margin-bottom: 0.8em; font-size: 0.85em; text-transform: none; color: #000080; min-height: auto; padding: 12px 10px; cursor: default;">Links úteis</h3>
-            <div class="useful-links-container" style="margin-top: 2.5em; display: flex; flex-direction: column; gap: 15px; text-align: center;">
-                <a href="https://fabrica-de-calculos.app.trf3.jus.br/atrasados/" target="_blank" style="color: #000080; text-decoration: none; font-size: 1.15em; padding: 4px 8px; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Fábrica de Cálculos - TRF3</a>
-                <a href="https://www.jfrs.jus.br/contafacilprev/" target="_blank" style="color: #000080; text-decoration: none; font-size: 1.15em; padding: 4px 8px; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Conta Fácil - TRF4</a>
-                <!-- Para adicionar novos links no futuro, basta copiar a linha acima e alterar o texto e o link -->
+            <h3 class="action-button" style="margin-top: 1.5em; margin-bottom: 0.8em; font-size: 0.85em; text-transform: none; color: #1e3a8a; min-height: auto; padding: 12px 10px; cursor: default; background-color: transparent; border-color: transparent; box-shadow: none;">Links úteis</h3>
+            <div class="useful-links-container" style="margin-top: 1.5em; display: flex; flex-direction: column; gap: 15px; text-align: center;">
+                <a href="https://fabrica-de-calculos.app.trf3.jus.br/atrasados/" target="_blank" style="color: #2563eb; text-decoration: none; font-size: 1.05em; font-weight: 600; padding: 8px; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#eff6ff'" onmouseout="this.style.backgroundColor='transparent'">Fábrica de Cálculos - TRF3</a>
+                <a href="https://www.jfrs.jus.br/contafacilprev/" target="_blank" style="color: #2563eb; text-decoration: none; font-size: 1.05em; font-weight: 600; padding: 8px; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#eff6ff'" onmouseout="this.style.backgroundColor='transparent'">Conta Fácil - TRF4</a>
             </div>
         </div>
 
@@ -1069,7 +1009,7 @@
     
     <div id="confirmationModal" class="modal-overlay">
         <div class="modal-content">
-            <p>Deseja realmente limpar os dados?</p>
+            <p style="font-weight: 600;">Deseja realmente limpar os dados?</p>
             <div class="modal-buttons">
                 <button id="confirmClearButton" class="modal-button sim">SIM</button>
                 <button id="cancelClearButton" class="modal-button nao">NÃO</button>
@@ -1077,11 +1017,11 @@
         </div>
     </div>
 
-    <!-- Modal de Histórico de Tetos -->
+    <!-- Modal de Histórico de Tetos (Atualizado 2026) -->
     <div id="historicoModal" class="modal-overlay">
         <div class="modal-content modal-content-historic">
             <span class="close-modal-button">&times;</span>
-            <h2>Histórico: Salário Mínimo e Teto do JEF (2016-2025)</h2>
+            <h2>Histórico: Salário Mínimo e Teto do JEF (2016-2026)</h2>
             <div class="historic-table-container">
                 <table class="historic-table">
                     <thead>
@@ -1093,6 +1033,12 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>2026</td>
+                            <td>Jan - Dez</td>
+                            <td>R$ 1.621,00</td>
+                            <td>R$ 97.260,00</td>
+                        </tr>
                         <tr>
                             <td>2025</td>
                             <td>Jan - Dez</td>
@@ -1178,7 +1124,7 @@
     <div id="rpaTetoModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal-button">&times;</span>
-            <h2>Cálculo de RPV acima do teto do JEF:</h2>
+            <h2>Cálculo de RPV acima do teto:</h2>
             <div class="form-group">
                 <label for="rpaValorTotal">Insira o valor total com os juros:</label>
                 <input type="text" id="rpaValorTotal" placeholder="R$ 0,00">
@@ -1868,19 +1814,17 @@
             const closeRpaModal = rpaTetoModal.querySelector('.close-modal-button');
             const calculateRpaButton = document.getElementById('calculateRpaButton');
             const copyRpaButton = document.getElementById('copyRpaButton');
-            const closeRpaBtn = document.getElementById('closeRpaBtn'); // Novo Botão
+            const closeRpaBtn = document.getElementById('closeRpaBtn'); 
             const rpaValorTotalInput = document.getElementById('rpaValorTotal');
             const clearRpaModalButton = document.getElementById('clearRpaModalButton');
 
             rpaTetoButton.addEventListener('click', () => rpaTetoModal.classList.add('active'));
             
-            // Função para fechar fechando no "X"
             closeRpaModal.addEventListener('click', () => {
                 clearRpaModalFields();
                 rpaTetoModal.classList.remove('active');
             });
             
-            // Lógica do NOVO botão Fechar (RPV Acima do Teto)
             if (closeRpaBtn) {
                 closeRpaBtn.addEventListener('click', () => {
                     clearRpaModalFields();
@@ -1952,7 +1896,7 @@
             const closeJurosModal = jurosModal.querySelector('.close-modal-button');
             const copyJurosModalButton = document.getElementById('copyJurosModalButton');
             const clearJurosModalButton = document.getElementById('clearJurosModalButton');
-            const closeJurosBtn = document.getElementById('closeJurosBtn'); // Novo Botão
+            const closeJurosBtn = document.getElementById('closeJurosBtn'); 
             const jurosModalPrincipal = document.getElementById('jurosModalValorPrincipal');
             const jurosModalCorrigido = document.getElementById('jurosModalValorCorrigido');
             const jurosModalResultado = document.getElementById('jurosModalResultado');
@@ -1964,7 +1908,6 @@
                 jurosModal.classList.remove('active');
             });
 
-            // Lógica do NOVO botão Fechar (NÃO TENHO O VALOR DOS JUROS)
             if (closeJurosBtn) {
                 closeJurosBtn.addEventListener('click', () => {
                     clearJurosModalFields();
